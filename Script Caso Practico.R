@@ -31,6 +31,8 @@ ggplot(data = nacimientos, mapping = aes(x= sexo, y=peso))+theme_bw()+
 ggplot(data= nacimientos)+theme_bw()+
   geom_point(mapping = aes(x=log(peso), y=talla, color = sexo))
 
+##############################Analisis de Medias#######################################
+
 ## hipotesis ninos 
 niños <- nacimientos %>%
   filter(sexo=="Hombre")
@@ -60,7 +62,7 @@ niñas <- niñas %>%
   filter(edadgestacional>=38)
 t.test(niñas$peso, mu=3200, conf.level = .95)
 
-## se colocan ninos de una region en especifico
+## se filtran niños que fueron atendidos por el IMSS
 
 unique(nacimientos$lugarnacimiento)
 niñas <- niñas %>%
@@ -71,6 +73,7 @@ niños <- niños %>%
   filter(lugarnacimiento=="IMSS")
 t.test(niños$peso, mu=3300, conf.level = .95)
 
+##############################Analisis de Varianza #######################################
 
 
 nacimientos %>%
