@@ -5,6 +5,8 @@ options(scipen=999)
 library(readr)
 library(tidyverse)
 library(ggplot2)
+library(dplyr)
+library(PerformanceAnalytics)
 ## Desarollo 
 ## Importacion de Base de Datos 
 nacimientos <- read_csv("nacimientos.csv",locale = locale(encoding = "latin1"))
@@ -18,18 +20,41 @@ nacimientos <- nacimientos %>%
 summary(nacimientos)
 ## Analisis Graficos
 table(nacimientos$cesarea, nacimientos$sexo) ## Contamos la cantidad  
-ggplot(data = nacimientos, mapping = aes(x= sexo , fill= cesarea ))+theme_bw()+
-  geom_bar(position = 'fill')
+##Edad de la madre en años cumplidos
 
-ggplot(data= nacimientos)+theme_bw()+
-  geom_histogram(mapping = aes(x= peso), bins = 50)
+summary(nacimientos$edad)
 
-ggplot(data = nacimientos, mapping = aes(x= sexo, y=peso))+theme_bw()+
-  geom_boxplot()+
-  coord_flip()
+etiqueta <- round(fivenum(nacimientos$edad), digits = 2)
+boxplot(x=nacimientos$edad, col="red", horizontal = TRUE, xlab="edad", main="Distribución de la Edad")
+text(x=etiqueta, y=c(1.15,1.25,1.25,1.25,1.15), labels = etiqueta)
 
-ggplot(data= nacimientos)+theme_bw()+
-  geom_point(mapping = aes(x=log(peso), y=talla, color = sexo))
+
+##Cantidad de sexo del nacido vivo
+ggplot(data = nacimientos) + geom_bar(mapping = aes(x = sexo) ,fill = "#BE81F7", color = "red")
+
+
+##Peso promedio
+
+etiqueta <- round(fivenum(nacimientos$peso), digits = 2)
+boxplot(nacimientos$peso ~ nacimientos$sexo,
+        col = rainbow(ncol(nacimientos)), xlab = "sexo", ylab = "peso", main = "Peso promedio")
+text(y=etiqueta, x=c(1.15,1.25,1.25,1.25,1.15,2.3,2.5,2.5,2.5,2.3), labels = etiqueta)
+
+##Correlación entre las variables peso-edadgestacional
+
+data<-select(nacimientos, peso, edadgestacional)
+chart.Correlation(data, histogram = TRUE, method = "pearson")
+
+##Histograma
+ggplot(na.omit(nacimientos))+
+  geom_histogram(aes(x=talla), bins = 30, color = "green")
+
+
+## Correlación Peso - Talla de hombre y mujer
+
+ggplot(nacimientos)+geom_point(aes(x=peso, y=talla, color=sexo, shape=sexo))+
+  scale_y_log10()+
+  scale_x_log10()
 
 ##############################Analisis de Medias#######################################
 
